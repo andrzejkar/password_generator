@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Password generator</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js"></script>
+</head>
+<body>    
+	<div class="container mt-4">
+	   <h1>Password Generator</h1>
+        <div class="row">
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="mb-4">Strength</h4>
+                        <label for="lenght">Length: <span class="fw-bold" id="charCount">10</span> characters</label>
+                        <div class="mb-3 ">
+                            <input type="range" class="form-range" min="8" max="20" step="1" id="lenght" onInput="$('#charCount').html($(this).val())" value="10">
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="letters" checked disabled>
+                            <label class="form-check-label" for="letters">Lowercase and uppercase letters</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="number" checked>
+                            <label class="form-check-label" for="number">Digits</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="special" checked>
+                            <label class="form-check-label" for="special">Special chars</label>
+                        </div>
+                        <div class="text-center mt-4">
+                            <button class="btn btn-success" id="genButton">Generate</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-5 text-center d-none" id="resultDiv">
+                <h2 class="text-muted">Your password</h2>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h1 id="result" class=""></h1>
+                    </div>
+                </div>
+                <p class="text-success">The password has been copied to the clipboard.<br/>
+                To paste it anywhere, use <code>crtl+v</code>.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+    <script>
+    $(document).ready( function () {
+
+        $('#genButton').on('click', function () {
+            const letters = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPRSTUVWXYZ';
+            const numbers = '123456789';
+            const symbols = '!@-#$';
+            let chars = letters;
+            let regStr = '^(?=.*[a-z][A-Z])';
+
+            if ($('#number').is(':checked')) {
+                chars += numbers;
+                regStr += '(?=.*[0-9])';
+            }
+
+            if ($('#special').is(':checked')) {
+                chars += symbols;
+                regStr += '(?=.*[!@#$])';
+            }
+
+            const regExp = new RegExp(regStr);
+            let password = generatePassword(chars);
+            while (!password.match(regExp)) {
+                password = generatePassword(chars);
+            }
+            password = mix(password);
+            $('#resultDiv').removeClass('d-none');
+            navigator.clipboard.writeText(password);
+            $('#result').text(password);
+        });
+
+
+        function generatePassword(chars) {
+            const lenght = $('#lenght').val();
+            let string="";
+            for (let i = 0; i < lenght; i++) {
+                let rnum = Math.floor(Math.random() * chars.length);
+                string += chars[rnum];
+            }
+            return string;
+        }
+
+        function mix(password) {
+            let array = password.split('');
+            let currentIndex = array.length,  randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array.join('');
+        }
+
+    });
+
+</script>
+</body>
+</html>
