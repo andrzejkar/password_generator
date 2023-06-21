@@ -1,1 +1,1 @@
-Simple password generetor with jQuery
+Simple password generator with jQuery
